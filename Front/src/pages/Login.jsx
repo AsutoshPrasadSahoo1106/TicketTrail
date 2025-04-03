@@ -4,7 +4,6 @@ import { FaLinkedin, FaFacebook, FaGoogle, FaGithub } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/LoginPage.css";
-import axios from "axios";
 
 const Login = () => {
   const [isActive, setIsActive] = useState(false);
@@ -48,21 +47,20 @@ const Login = () => {
     }
 
     const formData = new FormData(e.target);
-    formData.append("profilePicture", profilePic); // Ensure this matches the backend field name
+    formData.append("profilePic", profilePic);
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await fetch("/signup", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error(await response.text());
 
       alert("Account created successfully!");
       setIsActive(false);
     } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong");
+      alert(error.message);
     }
   };
 
@@ -96,38 +94,23 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <Container
-      fluid
-      className="login-page d-flex align-items-center justify-content-center"
-    >
+    <Container fluid className="login-page d-flex align-items-center justify-content-center">
       <div className={`login-container ${isActive ? "active" : ""}`}>
+
         {/* Sign Up Form */}
         <div className="form-container sign-up">
           <Form onSubmit={handleSignUp}>
             <h1>Create Account</h1>
             <div className="social-icons">
-              <a href="#">
-                <FaLinkedin />
-              </a>
-              <a href="#">
-                <FaFacebook />
-              </a>
-              <a href="#">
-                <FaGoogle />
-              </a>
-              <a href="#">
-                <FaGithub />
-              </a>
+              <a href="#"><FaLinkedin /></a>
+              <a href="#"><FaFacebook /></a>
+              <a href="#"><FaGoogle /></a>
+              <a href="#"><FaGithub /></a>
             </div>
             <span>or use your email for registration</span>
 
             <Form.Control type="text" placeholder="Name" name="name" required />
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              name="email"
-              required
-            />
+            <Form.Control type="email" placeholder="Email" name="email" required />
 
             <Form.Select name="gender" required className="mt-2">
               <option value="">Select Gender</option>
@@ -136,33 +119,18 @@ const Login = () => {
               <option value="other">Other</option>
             </Form.Select>
 
-            <Form.Control
-              type="tel"
-              placeholder="Phone Number"
-              name="phone"
-              pattern="[0-9]{10}"
-              required
+            <Form.Control 
+              type="tel" 
+              placeholder="Phone Number" 
+              name="phone" 
+              pattern="[0-9]{10}" 
+              required 
               className="mt-2"
             />
 
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              name="password"
-              required
-              className="mt-2"
-            />
-            <Form.Control
-              type="password"
-              placeholder="Confirm Password"
-              name="confirmPassword"
-              required
-              className="mt-2"
-              onChange={handlePasswordCheck}
-            />
-            {!passwordsMatch && (
-              <p className="text-danger">Passwords do not match!</p>
-            )}
+            <Form.Control type="password" placeholder="Password" name="password" required className="mt-2" />
+            <Form.Control type="password" placeholder="Confirm Password" name="confirmPassword" required className="mt-2" onChange={handlePasswordCheck} />
+            {!passwordsMatch && <p className="text-danger">Passwords do not match!</p>}
 
             <Form.Select name="role" required className="mt-2">
               <option value="user">User</option>
@@ -170,27 +138,12 @@ const Login = () => {
             </Form.Select>
 
             <Form.Group controlId="formFile" className="mt-3">
-              <Form.Label>
-                Upload Profile Picture (Max: 2MB, JPG/PNG)
-              </Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/jpeg, image/png"
-                onChange={handleFileChange}
-              />
-              {preview && (
-                <Image
-                  src={preview}
-                  className="mt-3 rounded-circle"
-                  width={100}
-                  height={100}
-                />
-              )}
+              <Form.Label>Upload Profile Picture (Max: 2MB, JPG/PNG)</Form.Label>
+              <Form.Control type="file" accept="image/jpeg, image/png" onChange={handleFileChange} />
+              {preview && <Image src={preview} className="mt-3 rounded-circle" width={100} height={100} />}
             </Form.Group>
 
-            <Button type="submit" className="w-100 mt-3">
-              Sign Up
-            </Button>
+            <Button type="submit" className="w-100 mt-3">Sign Up</Button>
           </Form>
         </div>
 
@@ -199,38 +152,16 @@ const Login = () => {
           <Form onSubmit={handleLogin}>
             <h1>Sign In</h1>
             <div className="social-icons">
-              <a href="#">
-                <FaLinkedin />
-              </a>
-              <a href="#">
-                <FaFacebook />
-              </a>
-              <a href="#">
-                <FaGoogle />
-              </a>
-              <a href="#">
-                <FaGithub />
-              </a>
+              <a href="#"><FaLinkedin /></a>
+              <a href="#"><FaFacebook /></a>
+              <a href="#"><FaGoogle /></a>
+              <a href="#"><FaGithub /></a>
             </div>
             <span>or use your email password</span>
-            <Form.Control
-              type="email"
-              placeholder="Email"
-              name="email"
-              required
-            />
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              name="password"
-              required
-            />
-            <a href="#" className="d-block my-2">
-              Forgot Your Password?
-            </a>
-            <Button type="submit" className="w-100 mt-3">
-              Sign In
-            </Button>
+            <Form.Control type="email" placeholder="Email" name="email" required />
+            <Form.Control type="password" placeholder="Password" name="password" required />
+            <a href="#" className="d-block my-2">Forgot Your Password?</a>
+            <Button type="submit" className="w-100 mt-3">Sign In</Button>
           </Form>
         </div>
 
@@ -240,16 +171,12 @@ const Login = () => {
             <div className="toggle-panel toggle-left">
               <h1>Welcome Back!</h1>
               <p>Enter your details to continue</p>
-              <Button variant="outline-light" onClick={toggleForm}>
-                Sign In
-              </Button>
+              <Button variant="outline-light" onClick={toggleForm}>Sign In</Button>
             </div>
             <div className="toggle-panel toggle-right">
               <h1>Hello, Friend!</h1>
               <p>Register to get started</p>
-              <Button variant="outline-light" onClick={toggleForm}>
-                Sign Up
-              </Button>
+              <Button variant="outline-light" onClick={toggleForm}>Sign Up</Button>
             </div>
           </div>
         </div>
