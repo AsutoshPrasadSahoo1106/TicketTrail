@@ -13,12 +13,15 @@ const promoRoutes = require("./routes/promoRoutes");
 dotenv.config();
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware
+
+// ✅ Middleware
 app.use(express.json());
 app.use(cors());
+app.use("/uploads", express.static("uploads")); // Serve uploaded images statically
 
-// Routes
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
@@ -26,15 +29,39 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/promos", promoRoutes);
 
-// Database Connection
-mongoose.connect(process.env.MONGO_URI).then(() => {
-  console.log("MongoDB Connected");
-}).catch((err) => {
-  console.error("MongoDB Connection Error:", err);
+// ✅ MongoDB Connection with Retry Logic
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI
+);
+    console.log("✅ MongoDB Connected Successfully!");
+  } catch (error) {
+    console.error("❌ MongoDB Connection Error:", error);
+    setTimeout(connectDB, 5000); // Retry after 5 seconds if connection fails
+  }
+};
+
+connectDB();
+
+// ✅ Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("Error:", err.message);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
-// Start Server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// ✅ Handle Process Termination Gracefully
+process.on("SIGINT", async () => {
+  console.log("🛑 Server shutting down...");
+  await mongoose.connection.close();
+  console.log("✅ MongoDB connection closed.");
+  process.exit(0);
 });

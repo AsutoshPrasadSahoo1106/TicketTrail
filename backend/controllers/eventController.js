@@ -1,27 +1,46 @@
 const Event = require('../models/eventModel');
 
-// Create Event (Organizer Only)
+
+
+// Create Event with Local Image Upload
 exports.createEvent = async (req, res) => {
   try {
     const { title, description, category, date, time, venue, location, ticketTypes } = req.body;
-    
-    if (!req.file) return res.status(400).json({ message: "Event image is required." });
 
-    const result = await cloudinary.uploader.upload(req.file.path);
+    // Check if event image is provided
+    if (!req.file) {
+      return res.status(400).json({ message: "Event image is required." });
+    }
 
-    
+    // Get event image URL after upload
+    const eventImageUrl = `/uploads/events/${req.file.filename}`;
+
+    // Create new event
     const newEvent = new Event({
-      title, description, category, date, time, venue, location, ticketTypes,eventImage: result.secure_url,
-      organizer: req.user.userId
+      title,
+      description,
+      category,
+      date,
+      time,
+      venue,
+      location,
+      ticketTypes: JSON.parse(ticketTypes), // Parse ticketTypes if it's sent as string
+      image: eventImageUrl,
+      organizer: req.user.userId, // Organizer ID from JWT payload
     });
 
+    // Save event to DB
     await newEvent.save();
-    res.status(201).json(newEvent);
-
+    res.status(201).json({
+      message: "Event created successfully",
+      event: newEvent,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error:", error.message);
+    res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 // Get All Events
 exports.getEvents = async (req, res) => {

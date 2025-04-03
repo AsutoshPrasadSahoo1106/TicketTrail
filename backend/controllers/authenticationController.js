@@ -3,12 +3,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 const dotenv = require("dotenv");
 const upload = require("../middleware/uploadMiddleware.js"); // Import upload middleware
-const cloudinary = require("../config/cloudinaryConfig.js"); // Import Cloudinary helper
 
 dotenv.config();
 
+
+
 // Function to generate JWT Token
 const generateToken = (user) => {
+  
   return jwt.sign(
     { userId: user._id, role: user.role },
     process.env.JWT_SECRET,
@@ -16,50 +18,63 @@ const generateToken = (user) => {
   );
 };
 
-// Register User with Profile Picture Upload
 exports.register = async (req, res) => {
   try {
-    upload.single("profilePicture")(req, res, async (err) => {
-      if (err) return res.status(400).json({ message: err.message });
+    // Check for file upload errors
+    if (req.fileValidationError) {
+      return res.status(400).json({ message: req.fileValidationError });
+    }
 
-      const { name, email, password, role, phone, address } = req.body;
+    const { name, email, password, role, phone, address } = req.body;
 
-      if (!["user", "organizer"].includes(role)) {
-        return res.status(400).json({ message: "Invalid role" });
-      }
+    // Validate role
+    if (!["user", "organizer"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role. Choose 'user' or 'organizer'." });
+    }
 
-      let user = await User.findOne({ email });
-      if (user) return res.status(400).json({ message: "User already exists" });
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+   
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      let profilePictureUrl = "";
-      if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path);
-        profilePictureUrl = result.secure_url;
-      }
 
-      user = new User({
-        name,
-        email,
-        password: hashedPassword,
-        role,
-        phone: phone || "",
-        address: address || "",
-        profilePicture: profilePictureUrl,
-        wishlist: [],
-        bookings: [],
-      });
+    // Hash password before storing
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      await user.save();
+    // Store profile picture if available
+    let profilePictureUrl = "";
+    if (req.file) {
+      profilePictureUrl = `/uploads/users/${req.file.filename}`; // Local path of the image
+    }
 
-      // Generate JWT Token
-      const token = generateToken(user);
-
-      res.status(201).json({ message: "User registered successfully", token, user });
+    // Create new user instance
+    user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      phone: phone || "",
+      address: address || "",
+      profilePicture: profilePictureUrl, // Save the image path
+      wishlist: [],
+      bookings: [],
     });
 
+    // Save the user to the database
+    await user.save();
+
+    // Generate JWT token
+    const token = generateToken(user);
+
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user,
+    });
   } catch (error) {
+    console.error("Error:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 };

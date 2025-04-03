@@ -17,7 +17,7 @@ const eventSchema = new mongoose.Schema({
       sold: { type: Number, default: 0 },
     },
   ],
-  eventImage: [{ type: String }],
+  image: { type: String } ,
   promoCode: { type: String },
   isPublished: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
