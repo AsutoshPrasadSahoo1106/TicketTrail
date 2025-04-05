@@ -74,11 +74,34 @@ exports.updateEvent = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to update this event' });
     }
 
-    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // Prepare updated data
+    const updatedData = {
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      date: req.body.date,
+      time: req.body.time,
+      venue: req.body.venue,
+      location: req.body.location,
+    };
+
+    // Handle ticketTypes
+    if (req.body.ticketTypes) {
+      updatedData.ticketTypes = JSON.parse(req.body.ticketTypes); // Parse ticketTypes if sent as a string
+    }
+
+    // Handle image upload
+    if (req.file) {
+      updatedData.image = `/uploads/events/${req.file.filename}`;
+    }
+
+    // Update the event
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, updatedData, { new: true });
 
     res.json(updatedEvent);
 
   } catch (error) {
+    console.error("Error updating event:", error.message);
     res.status(500).json({ message: 'Server Error' });
   }
 };

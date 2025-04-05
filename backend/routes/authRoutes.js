@@ -1,6 +1,7 @@
 const express = require("express");
 const { register, login } = require("../controllers/authenticationController");
-const { upload, setUploadType } = require("../middleware/uploadMiddleware"); // ✅ Import upload & setUploadType middleware
+const { upload, setUploadType } = require("../middleware/uploadMiddleware"); 
+const multer = require('multer'); // ✅ Import upload & setUploadType middleware
 
 const router = express.Router();
 

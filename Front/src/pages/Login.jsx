@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Form, Button, Container, Image } from "react-bootstrap";
 import { FaLinkedin, FaFacebook, FaGoogle, FaGithub } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/LoginPage.css";
 
@@ -47,20 +48,17 @@ const Login = () => {
     }
 
     const formData = new FormData(e.target);
-    formData.append("profilePic", profilePic);
+    formData.append("profilePicture", profilePic);
 
     try {
-      const response = await fetch("/signup", {
-        method: "POST",
-        body: formData,
+      const response = await axios.post("http://localhost:5000/api/auth/register", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      if (!response.ok) throw new Error(await response.text());
 
       alert("Account created successfully!");
       setIsActive(false);
     } catch (error) {
-      alert(error.message);
+      alert(error.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -70,21 +68,16 @@ const Login = () => {
     const data = Object.fromEntries(formData.entries());
 
     try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await axios.post("http://localhost:5000/api/auth/login", data);
 
-      if (!response.ok) throw new Error(await response.text());
-
-      const user = await response.json();
+      const { token, user } = response.data;
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
 
       alert(`Welcome, ${user.name}!`);
       navigate(user.role === "organizer" ? "/dashboard" : "/events");
     } catch (error) {
-      alert(error.message);
+      alert(error.response?.data?.message || "Invalid credentials");
     }
   };
 
@@ -94,9 +87,12 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <Container fluid className="login-page d-flex align-items-center justify-content-center">
+    <Container
+      fluid
+      className="login-page d-flex align-items-center justify-content-center"
+      style={{ paddingTop: "80px" }} // Added padding from the top
+    >
       <div className={`login-container ${isActive ? "active" : ""}`}>
-
         {/* Sign Up Form */}
         <div className="form-container sign-up">
           <Form onSubmit={handleSignUp}>
@@ -119,17 +115,24 @@ const Login = () => {
               <option value="other">Other</option>
             </Form.Select>
 
-            <Form.Control 
-              type="tel" 
-              placeholder="Phone Number" 
-              name="phone" 
-              pattern="[0-9]{10}" 
-              required 
+            <Form.Control
+              type="tel"
+              placeholder="Phone Number"
+              name="phone"
+              pattern="[0-9]{10}"
+              required
               className="mt-2"
             />
 
             <Form.Control type="password" placeholder="Password" name="password" required className="mt-2" />
-            <Form.Control type="password" placeholder="Confirm Password" name="confirmPassword" required className="mt-2" onChange={handlePasswordCheck} />
+            <Form.Control
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              required
+              className="mt-2"
+              onChange={handlePasswordCheck}
+            />
             {!passwordsMatch && <p className="text-danger">Passwords do not match!</p>}
 
             <Form.Select name="role" required className="mt-2">
@@ -160,7 +163,7 @@ const Login = () => {
             <span>or use your email password</span>
             <Form.Control type="email" placeholder="Email" name="email" required />
             <Form.Control type="password" placeholder="Password" name="password" required />
-            <a href="#" className="d-block my-2">Forgot Your Password?</a>
+            
             <Button type="submit" className="w-100 mt-3">Sign In</Button>
           </Form>
         </div>

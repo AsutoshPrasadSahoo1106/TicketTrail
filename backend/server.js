@@ -9,6 +9,8 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const promoRoutes = require("./routes/promoRoutes");
+const path = require("path");
+
 
 dotenv.config();
 
@@ -19,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Middleware
 app.use(express.json());
 app.use(cors());
-app.use("/uploads", express.static("uploads")); // Serve uploaded images statically
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Routes
 app.use("/api/auth", authRoutes);
