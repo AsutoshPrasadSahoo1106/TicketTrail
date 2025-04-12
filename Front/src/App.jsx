@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
 import EventDetails from "./pages/EventDetails";
+import BuyTickets from "./pages/BuyTickets";
+
 
 function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -48,8 +50,11 @@ function App() {
         />
 
         <Route path="/events/:id" element={<EventDetails />} />
+        <Route path="/events/:id/buy" element={<BuyTickets />} />
+
       </Routes>
     </Router>
+    
   );
 }
 

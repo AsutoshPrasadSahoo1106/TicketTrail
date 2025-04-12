@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Image, Button, Row, Col, Form } from "react-bootstrap";
+import { Container, Image, Button, Row, Col, Form, Badge } from "react-bootstrap";
+import { FaCalendar, FaClock, FaMapMarkerAlt, FaBuilding, FaTag, FaTicketAlt, FaEdit, FaTrash } from 'react-icons/fa';
 import axios from "axios";
+import "../styles/EventDetails.css";
+import "../styles/common.css";
+
 
 const EventDetails = () => {
   const { id } = useParams(); // Get the event ID from the URL
@@ -123,156 +127,198 @@ const EventDetails = () => {
   };
 
   return (
-    <Container className="mt-5" style={{ paddingTop: "80px" }}>
-      <Row>
-        <Col md={6}>
-          <Image src={imagePreview} fluid className="mb-4 rounded" />
-        </Col>
-        <Col md={6}>
-          {editMode ? (
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Time</Form.Label>
-                <Form.Control
-                  type="time"
-                  name="time"
-                  value={formData.time}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Venue</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="venue"
-                  value={formData.venue}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Category</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <h4 className="mt-4">Ticket Types</h4>
-              <Form.Group className="mb-3">
-                <Form.Label>General Tickets</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="generalQuantity"
-                  value={formData.generalQuantity}
-                  onChange={handleInputChange}
-                  placeholder="Quantity"
-                />
-                <Form.Control
-                  type="number"
-                  name="generalPrice"
-                  value={formData.generalPrice}
-                  onChange={handleInputChange}
-                  placeholder="Price"
-                  className="mt-2"
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>VIP Tickets</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="vipQuantity"
-                  value={formData.vipQuantity}
-                  onChange={handleInputChange}
-                  placeholder="Quantity"
-                />
-                <Form.Control
-                  type="number"
-                  name="vipPrice"
-                  value={formData.vipPrice}
-                  onChange={handleInputChange}
-                  placeholder="Price"
-                  className="mt-2"
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Event Image</Form.Label>
-                <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
-              </Form.Group>
-              <Button variant="success" className="me-2" onClick={handleSaveChanges}>
-                Save Changes
-              </Button>
-              <Button variant="secondary" onClick={handleEditToggle}>
-                Cancel
-              </Button>
-            </Form>
-          ) : (
-            <>
-              <h2>{event.title}</h2>
-              <p><strong>Date:</strong> {formatDate(event.date)}</p>
-              <p><strong>Time:</strong> {formatTime(event.time)}</p>
-              <p><strong>Location:</strong> {event.location}</p>
-              <p><strong>Venue:</strong> {event.venue}</p>
-              <p><strong>Category:</strong> {event.category}</p>
-              <p><strong>Description:</strong> {event.description}</p>
-              <h5>Ticket Types:</h5>
-              <ul>
-                {event.ticketTypes.map((ticket, index) => (
-                  <li key={index}>
-                    {ticket.name}: {ticket.quantity} tickets available at  &#8377;{ticket.price} each
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4">
-                <Button variant="warning" className="me-2" onClick={handleEditToggle}>
-                  Edit Event
+    <div className="page-container">
+    <div className="page-container event-details-container">
+      <Container>
+        <Row className="g-4">
+          <Col lg={7}>
+            <div className="event-image-container">
+              <Image src={imagePreview} className="event-image" />
+            </div>
+          </Col>
+          <Col lg={5}>
+            {editMode ? (
+              <Form className="edit-form">
+                <h3 className="mb-4">Edit Event</h3>
+                <Form.Group className="mb-3">
+                  <Form.Label>Title</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Time</Form.Label>
+                  <Form.Control
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Location</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Venue</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="venue"
+                    value={formData.venue}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Category</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+                <h4 className="mt-4">Ticket Types</h4>
+                <Form.Group className="mb-3">
+                  <Form.Label>General Tickets</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="generalQuantity"
+                    value={formData.generalQuantity}
+                    onChange={handleInputChange}
+                    placeholder="Quantity"
+                  />
+                  <Form.Control
+                    type="number"
+                    name="generalPrice"
+                    value={formData.generalPrice}
+                    onChange={handleInputChange}
+                    placeholder="Price"
+                    className="mt-2"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>VIP Tickets</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="vipQuantity"
+                    value={formData.vipQuantity}
+                    onChange={handleInputChange}
+                    placeholder="Quantity"
+                  />
+                  <Form.Control
+                    type="number"
+                    name="vipPrice"
+                    value={formData.vipPrice}
+                    onChange={handleInputChange}
+                    placeholder="Price"
+                    className="mt-2"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Event Image</Form.Label>
+                  <Form.Control type="file" accept="image/*" onChange={handleFileChange} />
+                </Form.Group>
+                <Button variant="success" className="me-2" onClick={handleSaveChanges}>
+                  Save Changes
                 </Button>
-                <Button variant="danger" onClick={handleDelete}>
-                  Delete Event
+                <Button variant="secondary" onClick={handleEditToggle}>
+                  Cancel
                 </Button>
+              </Form>
+            ) : (
+              <div className="event-info-card">
+                <h1 className="event-title">{event.title}</h1>
+                
+                <div className="info-badges mb-4">
+                  <div className="info-badge">
+                    <FaCalendar className="text-primary me-2" />
+                    {formatDate(event.date)}
+                  </div>
+                  <div className="info-badge">
+                    <FaClock className="text-primary me-2" />
+                    {formatTime(event.time)}
+                  </div>
+                  <div className="info-badge">
+                    <FaMapMarkerAlt className="text-primary me-2" />
+                    {event.location}
+                  </div>
+                  <div className="info-badge">
+                    <FaBuilding className="text-primary me-2" />
+                    {event.venue}
+                  </div>
+                  <div className="info-badge">
+                    <FaTag className="text-primary me-2" />
+                    <Badge bg="primary">{event.category}</Badge>
+                  </div>
+                </div>
+
+                <div className="description-section">
+                  <h5 className="fw-bold mb-3">About the Event</h5>
+                  <p>{event.description}</p>
+                </div>
+
+                <div className="ticket-section">
+                  <h5 className="fw-bold mb-3">
+                    <FaTicketAlt className="me-2" />
+                    Ticket Information
+                  </h5>
+                  {event.ticketTypes.map((ticket, index) => (
+                    <div key={index} className="ticket-type-card">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h6 className="mb-1">{ticket.name}</h6>
+                          <small className="text-muted">{ticket.quantity} tickets available</small>
+                        </div>
+                        <h5 className="mb-0">₹{ticket.price}</h5>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="action-buttons">
+                  <Button variant="warning" className="me-3" onClick={handleEditToggle}>
+                    <FaEdit className="me-2" />
+                    Edit Event
+                  </Button>
+                  <Button variant="danger" onClick={handleDelete}>
+                    <FaTrash className="me-2" />
+                    Delete Event
+                  </Button>
+                </div>
               </div>
-            </>
-          )}
-        </Col>
-      </Row>
-    </Container>
+            )}
+          </Col>
+        </Row>
+      </Container>
+    </div>
+    </div>
   );
 };
 

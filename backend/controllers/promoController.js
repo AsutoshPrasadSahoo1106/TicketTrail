@@ -33,3 +33,23 @@ exports.validatePromoCode = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+// Get Promo Code by Event ID
+exports.getPromoByEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // Fetch the promo code associated with the event
+    const promo = await PromoCode.findOne({ event: eventId });
+
+    if (!promo) {
+      return res.status(404).json({ message: 'No promo code found for this event' });
+    }
+
+    res.json(promo);
+
+  } catch (error) {
+    console.error('Error fetching promo code:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

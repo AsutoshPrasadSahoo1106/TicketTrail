@@ -1,0 +1,159 @@
+.event-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .event-image {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .event-image img {
+    transition: transform 0.3s ease;
+  }
+  
+  .event-image:hover img {
+    transform: scale(1.05);
+  }
+  
+  .event-details {
+    background: white;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .event-details:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .info-badge {
+    padding: 0.8rem 1.2rem;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    font-size: 1.1rem;
+  }
+  
+  .info-badge:hover {
+    background-color: #e9ecef;
+  }
+
+  .info-badge svg {
+    font-size: 1.3rem;
+  }
+  
+  .booking-card {
+    border-radius: 12px;
+    background: white;
+    position: sticky;
+    top: 100px;
+    font-size: 1.1rem;
+  }
+
+  .booking-card h4 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .booking-card h6 {
+    font-size: 1.3rem;
+  }
+
+  .booking-card .mb-2 h6 {
+    font-size: 1.2rem;
+  }
+
+  .booking-card .mb-2 small {
+    font-size: 1rem;
+  }
+
+  .booking-card .mb-2 h5 {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  
+  .ticket-type-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+  }
+  
+  .ticket-type-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1);
+  }
+  
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+    padding: 0.8rem 1rem !important;
+    transition: all 0.3s ease;
+    font-size: 1.1rem !important;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+  }
+
+  .form-label {
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+  }
+  
+  .buy-button {
+    border-radius: 8px;
+    padding: 1rem 2rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    font-size: 1.3rem !important;
+  }
+  
+  .buy-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+  }
+  
+  .event-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1.5rem;
+  }
+  
+  .event-description {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #495057;
+  }
+  
+  @media (max-width: 768px) {
+    .booking-card {
+      position: static;
+      margin-top: 24px;
+    }
+    
+    .event-title {
+      font-size: 2.5rem;
+    }
+
+    .booking-card h4 {
+      font-size: 1.8rem;
+    }
+
+    .form-label {
+      font-size: 1.1rem !important;
+    }
+  }
+

@@ -85,7 +85,7 @@ const CustomNavbar = () => {
                       }}
                       roundedCircle
                       width={60}
-                      height={60}
+                      height={69}
                       className="me-2 profile-image"
                       alt="Profile"
                     />

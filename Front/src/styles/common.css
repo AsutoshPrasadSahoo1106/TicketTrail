@@ -1,0 +1,4 @@
+.page-container {
+    padding-top: 100px; /* Adjust this value based on your navbar height */
+    min-height: 100vh;
+  }
