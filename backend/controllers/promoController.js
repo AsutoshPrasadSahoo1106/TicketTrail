@@ -6,7 +6,7 @@ exports.createPromoCode = async (req, res) => {
     const { code, discountType, discountValue, validFrom, validUntil, maxUses, event } = req.body;
 
     const promo = new PromoCode({
-      code, discountType, discountValue, validFrom, validUntil, maxUses, event
+      code, discountType, discountValue, validFrom, validUntil, maxUses, event,
     });
 
     await promo.save();
@@ -22,14 +22,32 @@ exports.validatePromoCode = async (req, res) => {
   try {
     const { code, eventId } = req.body;
 
-    const promo = await PromoCode.findOne({ code, event: eventId });
-    if (!promo || promo.usedCount >= promo.maxUses) {
-      return res.status(400).json({ message: 'Invalid or expired promo code' });
+    if (!code || !eventId) {
+      return res.status(400).json({ message: 'Promo code and event ID are required' });
     }
 
-    res.json({ discountType: promo.discountType, discountValue: promo.discountValue });
+    const promo = await PromoCode.findOne({ code});
 
+    if (!promo) {
+      console.log('Promo code not found:', code, eventId);
+      
+      return res.status(404).json({ message: 'Invalid promo code' });
+    }
+
+    if (promo.usedCount >= promo.maxUses) {
+      return res.status(400).json({ message: 'Promo code has reached its maximum usage limit' });
+    }
+
+    if (new Date(promo.validUntil) < new Date()) {
+      return res.status(400).json({ message: 'Promo code has expired' });
+    }
+
+    res.json({
+      discountType: promo.discountType,
+      discountValue: promo.discountValue,
+    });
   } catch (error) {
+    console.error('Error validating promo code:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

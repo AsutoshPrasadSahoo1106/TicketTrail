@@ -13,7 +13,8 @@ import Events from "./pages/Events";
 import CreateEvent from "./pages/CreateEvent";
 import EventDetails from "./pages/EventDetails";
 import BuyTickets from "./pages/BuyTickets";
-
+import Success from "./pages/Success";
+import Cancel from "./pages/Cancel";
 
 function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -48,13 +49,13 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/events/:id" element={<EventDetails />} />
         <Route path="/events/:id/buy" element={<BuyTickets />} />
-
+        <Route path="/buy-tickets/:id" element={<BuyTickets />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
       </Routes>
     </Router>
-    
   );
 }
 

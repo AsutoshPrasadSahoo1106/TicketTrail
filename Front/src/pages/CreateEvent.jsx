@@ -24,6 +24,7 @@ const CreateEvent = () => {
     validFrom: "",
     validUntil: "",
     maxUses: "",
+    event: "",
   });
 
   const [eventImage, setEventImage] = useState(null);
@@ -66,7 +67,7 @@ const CreateEvent = () => {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       // First create the event
       const eventResponse = await axios.post("http://localhost:5000/api/events", data, {
         headers: {
@@ -75,16 +76,20 @@ const CreateEvent = () => {
         },
       });
 
+      // Ensure the event ID is retrieved correctly
+      const eventId = eventResponse.data._id;
+      console.log("Event created with ID:", eventId);
+
       // If promo code is provided, create it
       if (formData.promoCode) {
         const promoData = {
           code: formData.promoCode,
-          discountType: "percentage",
+          discountType: formData.discountType,
           discountValue: formData.discountValue,
           validFrom: formData.validFrom,
           validUntil: formData.validUntil,
           maxUses: formData.maxUses,
-          event: eventResponse.data._id, // Link promo to created event
+          event: eventId, // Link promo to created event
         };
 
         await axios.post("http://localhost:5000/api/promos", promoData, {

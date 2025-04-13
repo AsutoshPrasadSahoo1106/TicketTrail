@@ -6,37 +6,28 @@ const PromoCode = require("../models/promoCodeModel.js");
 
 exports.bookEvent = async (req, res) => {
   try {
-    const { eventId, ticketType, quantity, promoCode, paymentMethodId } =
-      req.body;
+    const { eventId, ticketType, quantity, promoCode } = req.body;
 
     // 1️⃣ Find the Event
-    console.log("Event ID:", eventId);
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
     // 2️⃣ Get Ticket Price
-    console.log("Event Ticket Types:", event.ticketTypes);
-    console.log("Provided Ticket Type:", ticketType);
     const ticket = event.ticketTypes.find((t) => t.name === ticketType);
-    console.log("Selected Ticket:", ticket);
-
     if (!ticket) {
       return res.status(400).json({ message: "Invalid ticket type" });
     }
     const ticketPrice = ticket.price;
 
-    let totalPrice = ticket.price * quantity;
+    let totalPrice = ticket.price;
     let discountAmount = 0;
 
     // 3️⃣ Apply Promo Code (if exists)
-    let appliedPromoCode = null; // To store the applied promo code
     if (promoCode) {
-      console.log("Promo Code:", promoCode);
       const promo = await PromoCode.findOne({
         code: promoCode,
         event: eventId,
       });
-      console.log("Promo Code Details:", promo);
 
       if (
         promo &&
@@ -50,52 +41,39 @@ exports.bookEvent = async (req, res) => {
         totalPrice -= discountAmount;
         promo.usedCount += 1;
         await promo.save();
-        appliedPromoCode = promoCode; // Save the applied promo code
       }
     }
 
-    // 4️⃣ Create Stripe Payment Intent (Amount in paise)
-    console.log("Total Price:", totalPrice);
-    console.log("Payment Method ID:", paymentMethodId);
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalPrice * 100), // Stripe expects amount in paise
-      currency: "inr",
-      payment_method_types: ["card"], // Allow both UPI and card payments
-      payment_method: paymentMethodId,
-      confirm: true, // Auto-confirm payment
+    // 4️⃣ Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [{
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: `${event.title} - ${ticketType} Ticket`,
+          },
+          unit_amount: Math.round(totalPrice * 100),
+        },
+        quantity,
+      }],
+      mode: "payment",
+      success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:5173/cancel`,
+      metadata: {
+        userId: req.user.userId,
+        eventId,
+        ticketType,
+        quantity,
+        discountAmount,
+      },
     });
     
 
-    // 5️⃣ Save Booking
-    console.log("User ID:", req.user.userId);
-    console.log("Booking Details:", {
-      user: req.user.userId,
-      event: eventId,
-      ticketType,
-      quantity,
-      ticketPrice: ticket.price,
-      totalPrice,
-      discountAmount,
-      promoCode: appliedPromoCode, // Include the promo code
-      paymentId: paymentIntent.id,
-    });
-
-    const booking = new Booking({
-      user: req.user.userId,
-      event: eventId,
-      ticketType,
-      quantity,
-      ticketPrice: ticket.price, // Add the ticket price here
-      totalPrice,
-      discountAmount,
-      promoCode: appliedPromoCode, // Save the promo code
-      paymentId: paymentIntent.id,
-    });
-
-    await booking.save();
-    res.status(201).json({ message: "Booking confirmed", booking });
+    // 5️⃣ Send Checkout Session URL to Frontend
+    res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error("Booking Error:", error);
+    console.error("Stripe Checkout Error:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
@@ -111,5 +89,56 @@ exports.getUserBookings = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// In bookingController.js
+exports.confirmBooking = async (req, res) => {
+  const { sessionId } = req.body;
+
+  try {
+    // Step 1: Retrieve Stripe session
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const { userId, eventId, ticketType, quantity, discountAmount } = session.metadata;
+
+    // Step 2: Atomically create booking if it doesn't exist
+    const result = await Booking.findOneAndUpdate(
+      { paymentId: sessionId },
+      {
+        $setOnInsert: {
+          user: userId,
+          event: eventId,
+          ticketType,
+          quantity: parseInt(quantity),
+          totalPrice: session.amount_total / 100,
+          discountAmount,
+          status: "confirmed",
+          paymentId: sessionId,
+          bookingDate: new Date(),
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    // Step 3: If result existed before, return early
+    const alreadyConfirmed = await Booking.countDocuments({ paymentId: sessionId }) > 1;
+    if (alreadyConfirmed) {
+      return res.status(200).json({ message: "Booking already confirmed." });
+    }
+
+    // Step 4: Update ticket quantity only if this is a new booking
+    const event = await Event.findById(eventId);
+    const ticket = event.ticketTypes.find((t) => t.name === ticketType);
+    if (!ticket) return res.status(400).json({ message: "Invalid ticket type." });
+
+    ticket.quantity -= parseInt(quantity);
+    if (ticket.quantity < 0) ticket.quantity = 0; // prevent negative
+    await event.save();
+
+    res.status(200).json({ message: "Booking confirmed." });
+  } catch (err) {
+    console.error("Booking confirm error:", err);
+    res.status(500).json({ message: "Failed to confirm booking." });
+  }
+};
+
 
 

@@ -1,2 +1,4 @@
-const stripe = require('stripe')('sk_test_51R9imVFjVCXkZ1Ht0UDtIA9kyqqeHqVCoYJnINtU0gl3r5jMIQw101c7zhfehW0eHxPPbB28tZXhlabvzF8BgfDP00yhmsUVns'); // Replace with your Stripe secret key
+// filepath: c:\A MY FOLDERS\A study\CU\Study\SEM 4\MAJOR PROJECT\Code\TicketTrail\backend\config\stripe.js
+const Stripe = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // Add your Stripe Secret Key in .env
 module.exports = stripe;

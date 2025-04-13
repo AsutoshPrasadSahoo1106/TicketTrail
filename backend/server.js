@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -17,10 +18,32 @@ dotenv.config();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 
-
 // ✅ Middleware
 app.use(express.json());
 app.use(cors());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https://js.stripe.com", // Allow Stripe scripts
+        "https://r.stripe.com", // Allow Stripe analytics
+        "https://gc.kis.v2.scr.kaspersky-labs.com", // Allow Kaspersky scripts (if needed)
+      ],
+      frameSrc: [
+        "'self'",
+        "https://js.stripe.com", // Allow Stripe iframes
+      ],
+      connectSrc: [
+        "'self'",
+        "https://api.stripe.com", // Allow Stripe API
+        "https://r.stripe.com", // Allow Stripe analytics
+      ],
+      imgSrc: ["'self'", "data:", "https://*.stripe.com"], // Allow Stripe images
+    },
+  })
+);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ Routes
