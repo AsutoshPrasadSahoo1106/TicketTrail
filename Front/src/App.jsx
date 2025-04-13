@@ -15,6 +15,7 @@ import EventDetails from "./pages/EventDetails";
 import BuyTickets from "./pages/BuyTickets";
 import Success from "./pages/Success";
 import Cancel from "./pages/Cancel";
+import MyTickets from "./pages/MyTickets";
 
 function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -54,6 +55,7 @@ function App() {
         <Route path="/buy-tickets/:id" element={<BuyTickets />} />
         <Route path="/success" element={<Success />} />
         <Route path="/cancel" element={<Cancel />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
       </Routes>
     </Router>
   );
