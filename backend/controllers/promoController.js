@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const PromoCode = require('../models/promoCodeModel.js');
 
 // Create Promo Code
@@ -26,11 +27,9 @@ exports.validatePromoCode = async (req, res) => {
       return res.status(400).json({ message: 'Promo code and event ID are required' });
     }
 
-    const promo = await PromoCode.findOne({ code});
+    const promo = await PromoCode.findOne({ code });
 
     if (!promo) {
-      console.log('Promo code not found:', code, eventId);
-      
       return res.status(404).json({ message: 'Invalid promo code' });
     }
 
@@ -57,14 +56,13 @@ exports.getPromoByEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
 
-    // Fetch the promo code associated with the event
-    const promo = await PromoCode.findOne({ event: eventId });
+    const promos = await PromoCode.find({ event: new mongoose.Types.ObjectId(eventId) });
 
-    if (!promo) {
-      return res.status(404).json({ message: 'No promo code found for this event' });
+    if (!promos || promos.length === 0) {
+      return res.status(404).json({ message: 'No promo codes found for this event' });
     }
 
-    res.json(promo);
+    res.json(promos);
 
   } catch (error) {
     console.error('Error fetching promo code:', error);

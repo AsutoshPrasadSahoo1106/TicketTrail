@@ -85,8 +85,8 @@ app.listen(PORT, () => {
 
 // ✅ Handle Process Termination Gracefully
 process.on("SIGINT", async () => {
-  console.log("🛑 Server shutting down...");
+  console.log(" Server shutting down...");
   await mongoose.connection.close();
-  console.log("✅ MongoDB connection closed.");
+  console.log(" MongoDB connection closed.");
   process.exit(0);
 });

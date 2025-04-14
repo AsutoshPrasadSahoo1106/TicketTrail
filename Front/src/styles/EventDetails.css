@@ -129,3 +129,30 @@
     font-weight: 700;
     font-size: 1.25rem;
   }
+
+  .booking-stats {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+  }
+
+  .stats-card {
+    transition: transform 0.2s;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .stats-card h6 {
+    font-weight: 600;
+  }
+
+  .stats-card p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .booking-stats .card-title {
+    font-weight: 600;
+    color: #333;
+  }

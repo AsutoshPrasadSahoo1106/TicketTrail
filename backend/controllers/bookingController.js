@@ -129,7 +129,7 @@ exports.confirmBooking = async (req, res) => {
     const ticket = event.ticketTypes.find((t) => t.name === ticketType);
     if (!ticket) return res.status(400).json({ message: "Invalid ticket type." });
 
-    ticket.quantity -= parseInt(quantity);
+    
     if (ticket.quantity < 0) ticket.quantity = 0; // prevent negative
     await event.save();
 
@@ -137,6 +137,37 @@ exports.confirmBooking = async (req, res) => {
   } catch (err) {
     console.error("Booking confirm error:", err);
     res.status(500).json({ message: "Failed to confirm booking." });
+  }
+};
+
+exports.getEventBookingStats = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    
+    const bookings = await Booking.find({ 
+      event: eventId,
+      status: "confirmed" 
+    });
+
+    const stats = {
+      general: { count: 0, amount: 0 },
+      vip: { count: 0, amount: 0 }
+    };
+
+    bookings.forEach(booking => {
+      if (booking.ticketType === "General") {
+        stats.general.count += booking.quantity;
+        stats.general.amount += booking.totalPrice;
+      } else if (booking.ticketType === "VIP") {
+        stats.vip.count += booking.quantity;
+        stats.vip.amount += booking.totalPrice;
+      }
+    });
+
+    res.json(stats);
+  } catch (error) {
+    console.error("Error fetching booking stats:", error);
+    res.status(500).json({ message: "Error fetching booking statistics" });
   }
 };
 

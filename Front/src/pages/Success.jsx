@@ -35,7 +35,7 @@ const Success = () => {
   }, [sessionId]);
 
   const handleViewBookings = () => {
-    navigate("/bookings");
+    navigate("/my-tickets");
   };
 
   const handleGoHome = () => {

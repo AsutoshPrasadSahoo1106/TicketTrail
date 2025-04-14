@@ -17,6 +17,7 @@ import {
   FaMapMarkerAlt,
   FaBuilding,
   FaTag,
+  FaPercent,
 } from "react-icons/fa";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -87,13 +88,35 @@ const BuyTickets = () => {
   const [promoCode, setPromoCode] = useState(""); // Promo code (optional)
   const [discount, setDiscount] = useState(0); // Discount value
   const [isPromoValid, setIsPromoValid] = useState(false); // Promo code validity
+  const [availablePromos, setAvailablePromos] = useState([]);
+  const [promos, setPromos] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
+
+  const fetchPromoCodes = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:5000/api/promos/event/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setPromos(response.data);
+    } catch (error) {
+      console.error("Error fetching promos:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/events/${id}`
+          `http://localhost:5000/api/events/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setEvent(response.data);
       } catch (error) {
@@ -105,6 +128,7 @@ const BuyTickets = () => {
     };
 
     fetchEventDetails();
+    fetchPromoCodes();
   }, [id]);
 
   const handleBuyNow = async () => {
@@ -276,6 +300,73 @@ const BuyTickets = () => {
                     ))}
                   </div>
 
+                  <div className="mb-4">
+                    <h6 className="fw-bold mb-3">
+                      <FaPercent className="me-2" />
+                      Promo Codes
+                    </h6>
+
+                    {Array.isArray(promos) && promos.length > 0 ? (
+                      <div className="promo-codes-container">
+                        {promos.map((promo, index) => (
+                          <div key={index} className="promo-card mb-2 p-3 border rounded">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div>
+                                <h6 className="mb-1 fs-5">Code: {promo.code || "N/A"}</h6>
+                                <p className="mb-1 fs-6">
+                                  Discount: {promo.discountValue ?? "N/A"}
+                                  {promo.discountType === "percentage" ? "%" : "₹"}
+                                </p>
+                                <p className="mb-1 fs-6">
+                                  Valid until: {new Date(promo.validUntil).toLocaleDateString()}
+                                </p>
+                                <p className="mb-0 fs-6">
+                                  Uses remaining: {promo.maxUses - (promo.usedCount || 0)}
+                                </p>
+                              </div>
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => {
+                                  setPromoCode(promo.code);
+                                  
+                                }}
+                              >
+                                Apply Code
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted">No promo codes available for this event.</p>
+                    )}
+
+                    <Form.Group className="mt-4">
+                      <Form.Label className="fw-bold">Enter Promo Code</Form.Label>
+                      <div className="d-flex gap-2">
+                        <Form.Control
+                          type="text"
+                          value={promoCode}
+                          onChange={(e) => setPromoCode(e.target.value)}
+                          placeholder="Enter code manually"
+                        />
+                        <Button
+                          variant="primary"
+                          onClick={handleApplyPromoCode}
+                          disabled={!promoCode}
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                      {isPromoValid && (
+                        <small className="text-success d-block mt-2">
+                          Promo code applied! Discount: ₹{discount}
+                        </small>
+                      )}
+                    </Form.Group>
+                  </div>
+
                   <div>
                     <Form.Group className="mb-3">
                       <Form.Label className="fw-bold">
@@ -307,31 +398,6 @@ const BuyTickets = () => {
                         onChange={(e) => setQuantity(e.target.value)}
                         className="py-2"
                       />
-                    </Form.Group>
-
-                    <Form.Group className="mb-4">
-                      <Form.Label className="fw-bold">Promo Code</Form.Label>
-                      <div className="d-flex">
-                        <Form.Control
-                          type="text"
-                          placeholder="Enter promo code (optional)"
-                          value={promoCode}
-                          onChange={(e) => setPromoCode(e.target.value)}
-                          className="py-2 me-2"
-                        />
-                        <Button
-                          variant="secondary"
-                          onClick={handleApplyPromoCode}
-                          disabled={!promoCode}
-                        >
-                          Apply
-                        </Button>
-                      </div>
-                      {isPromoValid && (
-                        <small className="text-success">
-                          Promo code applied! Discount: ₹{discount}
-                        </small>
-                      )}
                     </Form.Group>
 
                     <div className="d-flex justify-content-between align-items-center mb-4">

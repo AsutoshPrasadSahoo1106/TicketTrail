@@ -10,7 +10,7 @@ const HeroSection = () => {
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src="https://wallpapercave.com/wp/wp1862480.jpg"
+              src="https://wallpapercave.com/w/wp1989190.jpg"
               alt="Holi Celebration"
               style={{ height: '100vh', objectFit: 'cover' }}
             />
@@ -27,6 +27,14 @@ const HeroSection = () => {
             <img
               className="d-block w-100"
               src="https://wallpapercave.com/wp/wp4223766.jpg"
+              alt="Jaisalmer"
+              style={{ height: '100vh', objectFit: 'cover' }}
+            />
+          </Carousel.Item>
+          <Carousel.Item>
+            <img
+              className="d-block w-100"
+              src="https://wallpapercave.com/w/wp10426684.jpg"
               alt="Jaisalmer"
               style={{ height: '100vh', objectFit: 'cover' }}
             />

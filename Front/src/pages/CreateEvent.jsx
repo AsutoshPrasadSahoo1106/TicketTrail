@@ -18,13 +18,6 @@ const CreateEvent = () => {
     generalPrice: "",
     vipQuantity: "",
     vipPrice: "",
-    promoCode: "",
-    discountType: "percentage", // or "fixed"
-    discountValue: "",
-    validFrom: "",
-    validUntil: "",
-    maxUses: "",
-    event: "",
   });
 
   const [eventImage, setEventImage] = useState(null);
@@ -75,29 +68,6 @@ const CreateEvent = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      // Ensure the event ID is retrieved correctly
-      const eventId = eventResponse.data._id;
-      console.log("Event created with ID:", eventId);
-
-      // If promo code is provided, create it
-      if (formData.promoCode) {
-        const promoData = {
-          code: formData.promoCode,
-          discountType: formData.discountType,
-          discountValue: formData.discountValue,
-          validFrom: formData.validFrom,
-          validUntil: formData.validUntil,
-          maxUses: formData.maxUses,
-          event: eventId, // Link promo to created event
-        };
-
-        await axios.post("http://localhost:5000/api/promos", promoData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
 
       alert("Event Created Successfully!");
       navigate("/dashboard");
@@ -298,83 +268,6 @@ const CreateEvent = () => {
                   />
                 </Form.Group>
               </div>
-            </div>
-          </section>
-
-          <section>
-            <h3 className="section-title">
-              <FaTicketAlt className="me-2" />
-              Promo Code (Optional)
-            </h3>
-            
-            <div className="promo-card">
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Promo Code</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="promoCode"
-                      value={formData.promoCode}
-                      onChange={handleChange}
-                      placeholder="Enter promo code (e.g., SUMMER2023)"
-                    />
-                  </Form.Group>
-                </Col>
-                
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Discount Value (%)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="discountValue"
-                      value={formData.discountValue}
-                      onChange={handleChange}
-                      placeholder="Enter discount percentage"
-                      min="0"
-                      max="100"
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Valid From</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="validFrom"
-                      value={formData.validFrom}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Valid Until</Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="validUntil"
-                      value={formData.validUntil}
-                      onChange={handleChange}
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={12}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Maximum Uses</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="maxUses"
-                      value={formData.maxUses}
-                      onChange={handleChange}
-                      placeholder="Enter maximum number of uses"
-                      min="1"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
             </div>
           </section>
 

@@ -157,3 +157,56 @@
     }
   }
 
+  .promo-codes-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  .promo-codes-container::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .promo-codes-container::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 5px;
+  }
+
+  .promo-code-item {
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+  }
+
+  .promo-code-item:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+  }
+
+  .promo-code-item h6 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .promo-code-item small {
+    font-size: 0.85rem;
+  }
+
+  .promo-card {
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+  }
+
+  .promo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .promo-card h6 {
+    color: #0d6efd;
+  }
+
+  .promo-card p {
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+  }
+

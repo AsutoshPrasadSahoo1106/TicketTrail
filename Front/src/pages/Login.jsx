@@ -75,7 +75,7 @@ const Login = () => {
       localStorage.setItem("token", token);
 
       alert(`Welcome, ${user.name}!`);
-      navigate(user.role === "organizer" ? "/dashboard" : "/events");
+      navigate(user.role === "organizer" ? "/dashboard" : "/my-tickets");
     } catch (error) {
       alert(error.response?.data?.message || "Invalid credentials");
     }
@@ -83,7 +83,7 @@ const Login = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user) navigate(user.role === "organizer" ? "/dashboard" : "/events");
+    if (user) navigate(user.role === "organizer" ? "/" : "/");
   }, [navigate]);
 
   return (
